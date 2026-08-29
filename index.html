@@ -101,8 +101,8 @@
     </div>
 
     <script>
-        // Target API URL: A free, public random quote engine
-        const API_URL = "https://api.allorigins.win/raw?url=https://zenquotes.io/api/random";
+        // Target API URL: a public random quote API with stable JSON output
+        const API_URL = "https://dummyjson.com/quotes/random";
 
         // DOM Elements
         const quoteText = document.getElementById("quoteText");
@@ -110,7 +110,43 @@
         const fetchBtn = document.getElementById("fetchBtn");
         const statusMessage = document.getElementById("statusMessage");
 
-        // YOUR CODE WILL GO HERE
+        async function fetchRandomQuote(url) {
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    return null;
+                }
+
+                const quoteData = await response.json();
+                return {
+                    q: quoteData.quote,
+                    a: quoteData.author
+                };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        fetchBtn.addEventListener("click", async function () {
+            fetchBtn.disabled = true;
+            fetchBtn.textContent = "Fetching...";
+            statusMessage.textContent = "";
+            statusMessage.classList.remove("error-text");
+
+            const data = await fetchRandomQuote(API_URL);
+
+            if (data === null) {
+                statusMessage.textContent = "Failed to load quote. Check your internet connection.";
+                statusMessage.classList.add("error-text");
+            } else {
+                quoteText.textContent = data.q;
+                quoteAuthor.textContent = data.a;
+            }
+
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = "Get New Quote";
+        });
     </script>
 </body>
 
